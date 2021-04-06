@@ -8,14 +8,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace VV\Db\Mysql;
+namespace VV\Db\Mysqli;
 
 /**
  * Class MysqliError
  *
- * @package VV\Db\Driver\Mysql
+ * @package VV\Db\Mysql
  */
 class MysqliError extends \RuntimeException {
-
     use \VV\Exception\Core;
 }

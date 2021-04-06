@@ -1,6 +1,6 @@
 {
-    "name": "phpvv/db-mysql",
-    "description": "VV DB Mysql",
+    "name": "phpvv/db-mysqli",
+    "description": "VV DB Driver over MySQLi extension",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -11,11 +11,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "VV\\Db\\Mysql\\": "Mysql"
+            "VV\\Db\\Mysqli\\": "src"
         }
     },
     "require": {
         "php": "^8.0",
+        "ext-mysqli": "*",
         "phpvv/db": "dev-master"
     },
     "require-dev": {

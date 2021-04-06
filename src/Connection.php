@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace VV\Db\Mysql;
+namespace VV\Db\Mysqli;
 
 /**
  * Class Connection
@@ -17,8 +17,7 @@ namespace VV\Db\Mysql;
  */
 class Connection implements \VV\Db\Driver\Connection {
 
-    /** @var \mysqli */
-    private $mysqli;
+    private ?\mysqli $mysqli;
 
     /**
      * Connection constructor.
@@ -37,7 +36,7 @@ class Connection implements \VV\Db\Driver\Connection {
         $queryString = $query->string();
 
         $mysqliError = function () use ($mysqli, $queryString) {
-            return \VV\Db\Mysql\Driver::mysqliError($mysqli, $queryString);
+            return \VV\Db\Mysqli\Driver::mysqliError($mysqli, $queryString);
         };
 
         $stmt = $mysqli->prepare($queryString);
@@ -45,7 +44,7 @@ class Connection implements \VV\Db\Driver\Connection {
             throw new \VV\Db\Exceptions\SqlExecutionError(null, null, $mysqliError());
         }
 
-        return new Statement($stmt, $this, $query);
+        return new Statement($stmt, $mysqli, $query);
     }
 
     /**

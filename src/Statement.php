@@ -8,7 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace VV\Db\Mysql;
+namespace VV\Db\Mysqli;
+
+use JetBrains\PhpStorm\Pure;
 
 /**
  * Class Statement
@@ -115,7 +117,8 @@ class Statement implements \VV\Db\Driver\Statement {
         $this->stmt = null;
     }
 
-    public function mysqliError() {
-        return \VV\Db\Mysql\Driver::mysqliError($this->mysqli, $this->query->string());
+    #[Pure]
+    public function mysqliError(): ?MysqliError {
+        return \VV\Db\Mysqli\Driver::mysqliError($this->mysqli, $this->query->string());
     }
 }

@@ -8,21 +8,22 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace VV\Db\Mysql;
+namespace VV\Db\Mysqli;
 
-use VV\Db\Driver\Driver as DriverAlias;
-use VV\Db\Driver\QueryStringifiers;
-use VV\Db\Sql;
+use JetBrains\PhpStorm\Pure;
 
 /**
  * Class Driver
  *
- * @package VV\Db\Driver
+ * @package VV\Db\Mysql
  */
 class Driver implements \VV\Db\Driver\Driver {
 
     const DFLT_CHARSET = 'UTF8';
 
+    /**
+     * @inheritdoc
+     */
     public function connect(string $host, string $user, string $passwd, ?string $scheme, ?string $charset): Connection {
         $mysqli = @new \mysqli($host, $user, $passwd, $scheme);
         if ($code = $mysqli->connect_errno) {
@@ -52,46 +53,17 @@ class Driver implements \VV\Db\Driver\Driver {
     }
 
     /**
-     * @param Sql\SelectQuery $query
-     *
-     * @return QueryStringifiers\SelectStringifier
+     * @inheritdoc
      */
-    public function createSelectStringifier(Sql\SelectQuery $query): QueryStringifiers\SelectStringifier {
-        return new SqlStringifier\SelectStringifier($query, $this);
-    }
-
-    /**
-     * @param Sql\InsertQuery $query
-     *
-     * @return QueryStringifiers\InsertStringifier
-     */
-    public function createInsertStringifier(Sql\InsertQuery $query): QueryStringifiers\InsertStringifier {
-        return new SqlStringifier\InsertStringifier($query, $this);
-    }
-
-    /**
-     * @param Sql\UpdateQuery $query
-     *
-     * @return QueryStringifiers\UpdateStringifier
-     */
-    public function createUpdateStringifier(Sql\UpdateQuery $query): QueryStringifiers\UpdateStringifier {
-        return new SqlStringifier\UpdateStringifier($query, $this);
-    }
-
-    /**
-     * @param Sql\DeleteQuery $query
-     *
-     * @return QueryStringifiers\DeleteStringifier
-     */
-    public function createDeleteStringifier(Sql\DeleteQuery $query): QueryStringifiers\DeleteStringifier {
-        return new SqlStringifier\DeleteStringifier($query, $this);
+    public function dbms(): string {
+        return self::DBMS_MYSQL;
     }
 
     /**
      * @inheritdoc
      */
-    public function dbmsName(): string {
-        return DriverAlias::DBMS_MYSQL;
+    public function sqlStringifiersFactory(): ?\VV\Db\Sql\Stringifiers\Factory {
+        return null;
     }
 
     /**
@@ -100,7 +72,8 @@ class Driver implements \VV\Db\Driver\Driver {
      *
      * @return MysqliError|null
      */
-    static function mysqliError(\mysqli $mysqli, $queryString = null) {
+    #[Pure]
+    static function mysqliError(\mysqli $mysqli, $queryString = null): ?MysqliError {
         if (!$code = $mysqli->errno) return null;
 
         $message = $mysqli->error;
