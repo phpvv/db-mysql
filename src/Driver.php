@@ -10,8 +10,6 @@
  */
 namespace VV\Db\Mysqli;
 
-use JetBrains\PhpStorm\Pure;
-
 /**
  * Class Driver
  *
@@ -72,7 +70,6 @@ class Driver implements \VV\Db\Driver\Driver {
      *
      * @return MysqliError|null
      */
-    #[Pure]
     static function mysqliError(\mysqli $mysqli, $queryString = null): ?MysqliError {
         if (!$code = $mysqli->errno) return null;
 

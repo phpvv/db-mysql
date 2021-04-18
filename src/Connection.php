@@ -22,7 +22,7 @@ class Connection implements \VV\Db\Driver\Connection {
     /**
      * Connection constructor.
      *
-     * @param $mysqli
+     * @param \mysqli $mysqli
      */
     public function __construct(\mysqli $mysqli) {
         $this->mysqli = $mysqli;

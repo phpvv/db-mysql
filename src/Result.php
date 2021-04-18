@@ -53,7 +53,7 @@ class Result implements \VV\Db\Driver\Result, \VV\Db\Driver\SeekableResult {
     /**
      * @inheritdoc
      */
-    public function insertedId() {
+    public function insertedId(): int|string|null {
         return $this->stmt->insert_id;
     }
 

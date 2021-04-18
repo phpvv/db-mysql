@@ -10,8 +10,6 @@
  */
 namespace VV\Db\Mysqli;
 
-use JetBrains\PhpStorm\Pure;
-
 /**
  * Class Statement
  *
@@ -117,7 +115,6 @@ class Statement implements \VV\Db\Driver\Statement {
         $this->stmt = null;
     }
 
-    #[Pure]
     public function mysqliError(): ?MysqliError {
         return \VV\Db\Mysqli\Driver::mysqliError($this->mysqli, $this->query->string());
     }
