@@ -15,6 +15,7 @@ namespace VV\Db\Mysqli;
  *
  * @package VV\Db\Mysql
  */
-class MysqliError extends \RuntimeException {
+class MysqliError extends \RuntimeException
+{
     use \VV\Exception\Core;
 }

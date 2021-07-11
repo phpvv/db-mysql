@@ -15,17 +15,15 @@ namespace VV\Db\Mysqli;
  *
  * @package VV\Db\Driver\Mysql
  */
-class Statement implements \VV\Db\Driver\Statement {
-
+class Statement implements \VV\Db\Driver\Statement
+{
     private ?\mysqli_stmt $stmt;
-
     private \mysqli $mysqli;
-
     private \VV\Db\Driver\QueryInfo $query;
-
     private ?array $blobs = null;
 
-    public function __construct(\mysqli_stmt $stmt, \mysqli $mysqli, \VV\Db\Driver\QueryInfo $query) {
+    public function __construct(\mysqli_stmt $stmt, \mysqli $mysqli, \VV\Db\Driver\QueryInfo $query)
+    {
         $this->stmt = $stmt;
         $this->mysqli = $mysqli;
         $this->query = $query;
@@ -35,14 +33,16 @@ class Statement implements \VV\Db\Driver\Statement {
     /**
      * @inheritdoc
      */
-    public function setFetchSize(int $size): void {
+    public function setFetchSize(int $size): void
+    {
         throw new \LogicException('Set fetch size is not supported for this driver');
     }
 
     /**
      * @inheritdoc
      */
-    public function bind(array $params): void {
+    public function bind(array $params): void
+    {
         if ($params) {
             $bind_types = '';
             static $types = ['string', 'integer', 'double'];
@@ -53,17 +53,17 @@ class Statement implements \VV\Db\Driver\Statement {
             foreach ($params as &$param) {
                 $type = 's';
                 if ($param instanceof \VV\Db\Param) {
-                    switch ($param->type()) {
+                    switch ($param->getType()) {
                         // LOBs to end
                         case \VV\Db\Param::T_TEXT:
                         case \VV\Db\Param::T_BLOB:
-                            $this->blobs[$i] = &$param->value();
+                            $this->blobs[$i] = &$param->getValue();
                             $param = null;
                             $type = 'b';
                             break;
 
                         default:
-                            $param = &$param->value();
+                            $param = &$param->getValue();
                             break;
                     }
                 }
@@ -82,7 +82,7 @@ class Statement implements \VV\Db\Driver\Statement {
 
             $bindReult = $this->stmt->bind_param($bind_types, ...$paramsForBind);
             if (!$bindReult) {
-                throw new \RuntimeException('Bind params error', 0, $this->mysqliError());
+                throw new \RuntimeException('Bind params error', 0, $this->createMysqliError());
             }
         }
     }
@@ -90,10 +90,13 @@ class Statement implements \VV\Db\Driver\Statement {
     /**
      * @inheritdoc
      */
-    public function exec(): \VV\Db\Driver\Result {
+    public function exec(): \VV\Db\Driver\Result
+    {
         if ($this->blobs) {
             foreach ($this->blobs as $nr => $value) {
-                if (!$value) continue;
+                if (!$value) {
+                    continue;
+                }
                 foreach ($value as $part) {
                     $this->stmt->send_long_data($nr, $part);
                 }
@@ -101,7 +104,7 @@ class Statement implements \VV\Db\Driver\Statement {
         }
 
         if (!$this->stmt->execute()) {
-            throw new \VV\Db\Exceptions\SqlSyntaxError(null, null, $this->mysqliError());
+            throw new \VV\Db\Exceptions\SqlSyntaxError(null, null, $this->createMysqliError());
         }
 
         return new Result($this->stmt);
@@ -110,12 +113,14 @@ class Statement implements \VV\Db\Driver\Statement {
     /**
      * @inheritdoc
      */
-    public function close(): void {
+    public function close(): void
+    {
         $this->stmt->close();
         $this->stmt = null;
     }
 
-    public function mysqliError(): ?MysqliError {
-        return \VV\Db\Mysqli\Driver::mysqliError($this->mysqli, $this->query->string());
+    public function createMysqliError(): ?MysqliError
+    {
+        return \VV\Db\Mysqli\Driver::createMysqliError($this->mysqli, $this->query->getString());
     }
 }

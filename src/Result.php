@@ -15,27 +15,33 @@ namespace VV\Db\Mysqli;
  *
  * @package VV\Db\Mysql
  */
-class Result implements \VV\Db\Driver\Result, \VV\Db\Driver\SeekableResult {
+class Result implements \VV\Db\Driver\Result, \VV\Db\Driver\SeekableResult
+{
 
     private \mysqli_stmt $stmt;
 
-    public function __construct(\mysqli_stmt $stmt) {
+    public function __construct(\mysqli_stmt $stmt)
+    {
         $this->stmt = $stmt;
     }
 
     /**
      * @inheritdoc
      */
-    public function seek(int $offset) {
+    public function seek(int $offset)
+    {
         $this->stmt->data_seek($offset);
     }
 
     /**
      * @inheritdoc
      */
-    public function fetchIterator(int $flags): \Traversable {
+    public function getIterator(int $flags): \Traversable
+    {
         $res = $this->stmt->get_result();
-        if (!$res) throw new \RuntimeException('get_result error');
+        if (!$res) {
+            throw new \RuntimeException('get_result error');
+        }
 
         $myFlags = 0;
         if ($flags & \VV\Db::FETCH_ASSOC) {
@@ -53,14 +59,16 @@ class Result implements \VV\Db\Driver\Result, \VV\Db\Driver\SeekableResult {
     /**
      * @inheritdoc
      */
-    public function insertedId(): int|string|null {
+    public function getInsertedId(): int|string|null
+    {
         return $this->stmt->insert_id;
     }
 
     /**
      * @inheritdoc
      */
-    public function affectedRows(): int {
+    public function getAffectedRows(): int
+    {
         return $this->stmt->affected_rows;
     }
 

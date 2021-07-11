@@ -10,13 +10,16 @@
  */
 namespace VV\Db\Mysqli;
 
+use VV\Db\Driver\QueryInfo;
+use VV\Db\Exceptions\SqlExecutionError;
+
 /**
  * Class Connection
  *
  * @package VV\Db\Driver\Mysql
  */
-class Connection implements \VV\Db\Driver\Connection {
-
+class Connection implements \VV\Db\Driver\Connection
+{
     private ?\mysqli $mysqli;
 
     /**
@@ -24,24 +27,26 @@ class Connection implements \VV\Db\Driver\Connection {
      *
      * @param \mysqli $mysqli
      */
-    public function __construct(\mysqli $mysqli) {
+    public function __construct(\mysqli $mysqli)
+    {
         $this->mysqli = $mysqli;
     }
 
     /**
      * @inheritdoc
      */
-    public function prepare(\VV\Db\Driver\QueryInfo $query): \VV\Db\Driver\Statement {
+    public function prepare(QueryInfo $query): \VV\Db\Driver\Statement
+    {
         $mysqli = $this->mysqli;
-        $queryString = $query->string();
+        $queryString = $query->getString();
 
         $mysqliError = function () use ($mysqli, $queryString) {
-            return \VV\Db\Mysqli\Driver::mysqliError($mysqli, $queryString);
+            return Driver::createMysqliError($mysqli, $queryString);
         };
 
         $stmt = $mysqli->prepare($queryString);
         if (!$stmt) {
-            throw new \VV\Db\Exceptions\SqlExecutionError(null, null, $mysqliError());
+            throw new SqlExecutionError(null, null, $mysqliError());
         }
 
         return new Statement($stmt, $mysqli, $query);
@@ -55,21 +60,24 @@ class Connection implements \VV\Db\Driver\Connection {
     /**
      * @inheritdoc
      */
-    public function commit(bool $autocommit = false): void {
+    public function commit(bool $autocommit = false): void
+    {
         $this->mysqli->commit();
     }
 
     /**
      * @inheritdoc
      */
-    public function rollback(): void {
+    public function rollback(): void
+    {
         $this->mysqli->rollback();
     }
 
     /**
      * @inheritdoc
      */
-    public function disconnect(): void {
+    public function disconnect(): void
+    {
         $this->mysqli->close();
         $this->mysqli = null;
     }
