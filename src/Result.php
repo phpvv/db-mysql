@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the VV package.
@@ -8,14 +8,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
+
 namespace VV\Db\Mysqli;
 
-/**
- * Class Result
- *
- * @package VV\Db\Mysql
- */
-class Result implements \VV\Db\Driver\Result, \VV\Db\Driver\SeekableResult
+use VV\Db;
+use VV\Db\Driver\Result as ResultInterface;
+use VV\Db\Driver\SeekableResult;
+
+class Result implements ResultInterface, SeekableResult
 {
 
     private \mysqli_stmt $stmt;
@@ -44,10 +46,10 @@ class Result implements \VV\Db\Driver\Result, \VV\Db\Driver\SeekableResult
         }
 
         $myFlags = 0;
-        if ($flags & \VV\Db::FETCH_ASSOC) {
+        if ($flags & Db::FETCH_ASSOC) {
             $myFlags |= MYSQLI_ASSOC;
         }
-        if ($flags & \VV\Db::FETCH_NUM) {
+        if ($flags & Db::FETCH_NUM) {
             $myFlags |= MYSQLI_ASSOC;
         }
 
@@ -75,5 +77,7 @@ class Result implements \VV\Db\Driver\Result, \VV\Db\Driver\SeekableResult
     /**
      * @inheritdoc
      */
-    public function close(): void { }
+    public function close(): void
+    {
+    }
 }

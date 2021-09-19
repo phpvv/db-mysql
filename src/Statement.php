@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the VV package.
@@ -8,21 +8,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
+
 namespace VV\Db\Mysqli;
 
-/**
- * Class Statement
- *
- * @package VV\Db\Driver\Mysql
- */
+use VV\Db\Driver\QueryInfo;
+use VV\Db\Exceptions\SqlSyntaxError;
+use VV\Db\Param;
+
 class Statement implements \VV\Db\Driver\Statement
 {
     private ?\mysqli_stmt $stmt;
     private \mysqli $mysqli;
-    private \VV\Db\Driver\QueryInfo $query;
+    private QueryInfo $query;
     private ?array $blobs = null;
 
-    public function __construct(\mysqli_stmt $stmt, \mysqli $mysqli, \VV\Db\Driver\QueryInfo $query)
+    public function __construct(\mysqli_stmt $stmt, \mysqli $mysqli, QueryInfo $query)
     {
         $this->stmt = $stmt;
         $this->mysqli = $mysqli;
@@ -52,11 +54,11 @@ class Statement implements \VV\Db\Driver\Statement
             $paramsForBind = [];
             foreach ($params as &$param) {
                 $type = 's';
-                if ($param instanceof \VV\Db\Param) {
+                if ($param instanceof Param) {
                     switch ($param->getType()) {
                         // LOBs to end
-                        case \VV\Db\Param::T_TEXT:
-                        case \VV\Db\Param::T_BLOB:
+                        case Param::T_TEXT:
+                        case Param::T_BLOB:
                             $this->blobs[$i] = &$param->getValue();
                             $param = null;
                             $type = 'b';
@@ -80,8 +82,8 @@ class Statement implements \VV\Db\Driver\Statement
             }
             unset($param);
 
-            $bindReult = $this->stmt->bind_param($bind_types, ...$paramsForBind);
-            if (!$bindReult) {
+            $bindResult = $this->stmt->bind_param($bind_types, ...$paramsForBind);
+            if (!$bindResult) {
                 throw new \RuntimeException('Bind params error', 0, $this->createMysqliError());
             }
         }
@@ -104,7 +106,7 @@ class Statement implements \VV\Db\Driver\Statement
         }
 
         if (!$this->stmt->execute()) {
-            throw new \VV\Db\Exceptions\SqlSyntaxError(null, null, $this->createMysqliError());
+            throw new SqlSyntaxError(previous: $this->createMysqliError());
         }
 
         return new Result($this->stmt);
@@ -121,6 +123,6 @@ class Statement implements \VV\Db\Driver\Statement
 
     public function createMysqliError(): ?MysqliError
     {
-        return \VV\Db\Mysqli\Driver::createMysqliError($this->mysqli, $this->query->getString());
+        return Driver::createMysqliError($this->mysqli, $this->query->getString());
     }
 }

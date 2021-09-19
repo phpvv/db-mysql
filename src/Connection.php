@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the VV package.
@@ -8,16 +8,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
+
 namespace VV\Db\Mysqli;
 
 use VV\Db\Driver\QueryInfo;
 use VV\Db\Exceptions\SqlExecutionError;
 
-/**
- * Class Connection
- *
- * @package VV\Db\Driver\Mysql
- */
 class Connection implements \VV\Db\Driver\Connection
 {
     private ?\mysqli $mysqli;
@@ -46,7 +44,7 @@ class Connection implements \VV\Db\Driver\Connection
 
         $stmt = $mysqli->prepare($queryString);
         if (!$stmt) {
-            throw new SqlExecutionError(null, null, $mysqliError());
+            throw new SqlExecutionError(previous: $mysqliError());
         }
 
         return new Statement($stmt, $mysqli, $query);
@@ -55,7 +53,9 @@ class Connection implements \VV\Db\Driver\Connection
     /**
      * @inheritDoc
      */
-    public function startTransaction(): void { }
+    public function startTransaction(): void
+    {
+    }
 
     /**
      * @inheritdoc
